@@ -66,7 +66,7 @@ def recipe_search(recipe):
     results = c.fetchall()
     for result in results:
         print(result)
-        print("/n")
+        print("\n")
 
     # closing the database connection
     db.close()
@@ -76,7 +76,7 @@ cmd = 9
 
 while cmd != 0:
     print("""
-    Hello. Welcome to Recipe Finder v0.1. Pl an option:
+    Hello. Welcome to Recipe Finder v0.1. Please select an option:
     
     [1] Search for recipe
     [2] Search for ingredient
@@ -91,3 +91,8 @@ while cmd != 0:
     elif cmd == 2:
         ingredient = input("Please input ingredient: ")
         ingredient_search(ingredient)
+
+print("""
+      Thank you for using Recipe Finder
+      Now exiting...
+      """)
