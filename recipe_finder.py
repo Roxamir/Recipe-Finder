@@ -71,10 +71,11 @@ def recipe_search(recipe):
     # closing the database connection
     db.close()
 
-
+# initialize values
 cmd = 9
 
 while cmd != 0:
+    # welcome message and cmd prompts
     print("""
     Hello. Welcome to Recipe Finder v0.1. Please select an option:
     
@@ -83,16 +84,28 @@ while cmd != 0:
     [0] EXIT
           
       """)
+    # user input for cmd
     cmd = int(input("Input a number then press 'ENTER': "))
 
-    if cmd == 1:
-        recipe = input("Please input recipe: ")
+    # confirmation that correct option was selected
+    print("\nYou selected option " + str(cmd) + ". Is this correct?")
+    confirm = input("\nPress enter to continue or type 'RESTART' to restart program: ")
+    if confirm == "RESTART":
+        cmd == 9
+    # recipe search selected
+    elif cmd == 1:
+        recipe = input("\nPlease input recipe: ")
         recipe_search(recipe)
+    # ingredient search selected
     elif cmd == 2:
-        ingredient = input("Please input ingredient: ")
+        ingredient = input("\nPlease input ingredient: ")
         ingredient_search(ingredient)
-
-print("""
-      Thank you for using Recipe Finder
-      Now exiting...
-      """)
+    # exit selected
+    elif cmd == 0:
+        print("""
+            Thank you for using Recipe Finder
+            Now exiting...
+            """)
+    # invalid input, program restarted.
+    else:
+        print("\nInvalid input. Please try again.")
