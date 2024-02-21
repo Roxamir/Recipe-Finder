@@ -11,6 +11,8 @@ Run the following command:
     "python recipe_finder.py"
 
 # Resources
-https://www.freecodecamp.org/news/postgresql-in-python/
+https://docs.python.org/3/library/sqlite3.html
 
-https://www.tutorialspoint.com/postgresql/postgresql_create_table.htm
+https://www.geeksforgeeks.org/how-to-execute-many-sqlite-statements-in-python/
+
+https://www.onceuponachef.com/inspiration/basic-recipes-everyone-should-know.html

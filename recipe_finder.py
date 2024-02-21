@@ -1,9 +1,7 @@
 import psycopg2
 import time
 
-def ingredient_search(ingredient):
-
-    # connecting to the postgres server
+def ingredient_search(ingredient):    # connecting to the postgres server
     db = psycopg2.connect(
     database="recipe_finder",
     host="localhost",
