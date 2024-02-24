@@ -18,3 +18,5 @@ https://www.geeksforgeeks.org/how-to-execute-many-sqlite-statements-in-python/
 https://www.onceuponachef.com/inspiration/basic-recipes-everyone-should-know.html
 
 https://www.tasteofhome.com/collection/essential-recipes-you-should-know-by-35/
+
+https://www.w3schools.com/sql/func_sqlserver_soundex.asp

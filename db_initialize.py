@@ -12,7 +12,7 @@ def create_db():
                     DROP TABLE IF EXISTS [recipes];
                     CREATE TABLE recipes(
                     recipe_id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    recipe_name VARCHAR(50),
+                    recipe_name VARCHAR(50) UNIQUE,
                     recipe_description TEXT,
                     recipe_instructions TEXT,
                     recipe_source TEXT
@@ -21,7 +21,7 @@ def create_db():
                     DROP TABLE IF EXISTS [ingredients];
                     CREATE TABLE ingredients(
                     ingredient_id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    ingredient_name VARCHAR(50),
+                    ingredient_name VARCHAR(50) UNIQUE,
                     ingredient_description TEXT
                     );
 
@@ -30,8 +30,7 @@ def create_db():
                     line_id INTEGER PRIMARY KEY AUTOINCREMENT,
                     recipe_id INTEGER NOT NULL,
                     ingredient_id INTEGER NOT NULL,
-                    quantity DECIMAL,
-                    unit VARCHAR(50),
+                    quantity VARCHAR(50),
                     FOREIGN KEY(recipe_id) REFERENCES recipes(recipe_id)
                         ON DELETE CASCADE ON UPDATE CASCADE,
                     FOREIGN KEY(ingredient_id) REFERENCES ingredients(ingredient_id)
@@ -40,7 +39,7 @@ def create_db():
                     """)
     
 def insert_data():
-    # insert recipe data
+    # insert recipe data into recipes table
     c.executescript("""
                     INSERT INTO recipes(recipe_name, recipe_description, recipe_instructions, recipe_source)
                     VALUES(
@@ -193,6 +192,473 @@ Reduce oven setting to 450°. Remove foil; bake bread until deep golden brown, 2
                     'https://www.tasteofhome.com/recipes/crusty-homemade-bread/'
                     );             
                     """)
+    
+    # insert ingredient data into ingredients table
+    c.executescript("""
+                    INSERT INTO ingredients (ingredient_name, ingredient_description)
+                    VALUES(
+                    'Butter (unsalted)',
+                    'Butter is a dairy product made from the fat and protein components of churned cream.
+It is a semi-solid emulsion at room temperature, consisting of approximately 80% butterfat.
+It is used at room temperature as a spread, melted as a condiment, and used as a fat in baking, sauce-making, pan frying, and other cooking procedures.'
+                    );
 
+                    INSERT INTO ingredients (ingredient_name, ingredient_description)
+                    VALUES(
+                    'Sugar',
+                    'White sugar, also called table sugar, granulated sugar, or regular sugar, is a commonly used type of sugar, made either of beet sugar or cane sugar, which has undergone a refining process.'
+                    );
+
+                    INSERT INTO ingredients (ingredient_name, ingredient_description)
+                    VALUES(
+                    'Brown Sugar',
+                    'Brown sugar is a sucrose sugar product with a distinctive brown color due to the presence of molasses.
+It is by tradition an unrefined or partially refined soft sugar consisting of sugar crystals with some residual molasses content (natural brown sugar), but is now often produced by the addition of molasses to refined white sugar (commercial brown sugar).'
+                    );
+
+                    INSERT INTO ingredients (ingredient_name, ingredient_description)
+                    VALUES(
+                    'Vanilla Extract',
+                    'Vanilla extract is a solution made by macerating and percolating vanilla pods in a solution of ethanol and water.
+It is considered an essential ingredient in many Western desserts, especially baked goods like cakes, cookies, brownies, and cupcakes, as well as custards, ice creams, and puddings.
+Although its primary flavor compound is vanillin, pure vanilla extract contains several hundred additional flavor compounds, which are responsible for its complex, deep flavor.'
+                    );
+
+                    INSERT INTO ingredients (ingredient_name, ingredient_description)
+                    VALUES(
+                    'Eggs',
+                    ''
+                    );
+
+                    INSERT INTO ingredients (ingredient_name, ingredient_description)
+                    VALUES(
+                    'Egg Whites',
+                    ''
+                    );
+
+                    INSERT INTO ingredients (ingredient_name, ingredient_description)
+                    VALUES(
+                    'Salt',
+                    ''
+                    );
+
+                     INSERT INTO ingredients (ingredient_name, ingredient_description)
+                    VALUES(
+                    'Black Pepper',
+                    ''
+                    );
+
+                    INSERT INTO ingredients (ingredient_name, ingredient_description)
+                    VALUES(
+                    'Baking Soda',
+                    ''
+
+                    );
+                    INSERT INTO ingredients (ingredient_name, ingredient_description)
+                    VALUES(
+                    'All Purpose Flour',
+                    ''
+                    );
+
+                    INSERT INTO ingredients (ingredient_name, ingredient_description)
+                    VALUES(
+                    'Chocolate Chips',
+                    ''
+                    );
+
+                    INSERT INTO ingredients (ingredient_name, ingredient_description)
+                    VALUES(
+                    'Mushrooms',
+                    ''
+                    );
+
+                    INSERT INTO ingredients (ingredient_name, ingredient_description)
+                    VALUES(
+                    'Spinach',
+                    ''
+                    );
+
+                    INSERT INTO ingredients (ingredient_name, ingredient_description)
+                    VALUES(
+                    'Shredded Provolone',
+                    ''
+                    );
+
+                    INSERT INTO ingredients (ingredient_name, ingredient_description)
+                    VALUES(
+                    'Tomatoes',
+                    ''
+                    );
+
+                    INSERT INTO ingredients (ingredient_name, ingredient_description)
+                    VALUES(
+                    'Onion',
+                    ''
+                    );
+
+                    INSERT INTO ingredients (ingredient_name, ingredient_description)
+                    VALUES(
+                    'Garlic',
+                    ''
+                    );
+
+                    INSERT INTO ingredients (ingredient_name, ingredient_description)
+                    VALUES(
+                    'Olive Oil',
+                    ''
+                    );
+
+                    INSERT INTO ingredients (ingredient_name, ingredient_description)
+                    VALUES(
+                    'Thyme',
+                    ''
+                    );
+
+                    INSERT INTO ingredients (ingredient_name, ingredient_description)
+                    VALUES(
+                    'Basil',
+                    ''
+                    );
+
+                    INSERT INTO ingredients (ingredient_name, ingredient_description)
+                    VALUES(
+                    'Cream Cheese',
+                    ''
+                    );
+
+                    INSERT INTO ingredients (ingredient_name, ingredient_description)
+                    VALUES(
+                    'Mayonnaise',
+                    ''
+                    );
+
+                    INSERT INTO ingredients (ingredient_name, ingredient_description)
+                    VALUES(
+                    'Cheddar Cheese',
+                    ''
+                    );
+
+                    INSERT INTO ingredients (ingredient_name, ingredient_description)
+                    VALUES(
+                    'Garlic Powder',
+                    ''
+                    );
+
+                    INSERT INTO ingredients (ingredient_name, ingredient_description)
+                    VALUES(
+                    'Italian Bread',
+                    ''
+                    );
+
+                    INSERT INTO ingredients (ingredient_name, ingredient_description)
+                    VALUES(
+                    'Romano Cheese',
+                    ''
+                    );
+
+                    INSERT INTO ingredients (ingredient_name, ingredient_description)
+                    VALUES(
+                    'Parsley',
+                    ''
+                    );
+
+                    INSERT INTO ingredients (ingredient_name, ingredient_description)
+                    VALUES(
+                    'French Bread',
+                    ''
+                    );
+
+                    INSERT INTO ingredients (ingredient_name, ingredient_description)
+                    VALUES(
+                    'Goat Cheese',
+                    ''
+                    );
+
+                    INSERT INTO ingredients (ingredient_name, ingredient_description)
+                    VALUES(
+                    'Ground Beef',
+                    ''
+                    );
+
+                    INSERT INTO ingredients (ingredient_name, ingredient_description)
+                    VALUES(
+                    'Italian Sausage',
+                    ''
+                    );
+
+
+                    INSERT INTO ingredients (ingredient_name, ingredient_description)
+                    VALUES(
+                    'Diced Tomatoes',
+                    ''
+                    );
+
+                    INSERT INTO ingredients (ingredient_name, ingredient_description)
+                    VALUES(
+                    'Tomato Paste',
+                    ''
+                    );
+
+                    INSERT INTO ingredients (ingredient_name, ingredient_description)
+                    VALUES(
+                    'Water',
+                    ''
+                    );
+
+                    INSERT INTO ingredients (ingredient_name, ingredient_description)
+                    VALUES(
+                    'Worcestershire Sauce',
+                    ''
+                    );
+
+                    INSERT INTO ingredients (ingredient_name, ingredient_description)
+                    VALUES(
+                    'Canola Oil',
+                    ''
+                    );
+
+                    INSERT INTO ingredients (ingredient_name, ingredient_description)
+                    VALUES(
+                    'Oregano',
+                    ''
+                    );
+
+                    INSERT INTO ingredients (ingredient_name, ingredient_description)
+                    VALUES(
+                    'Bay Leaves',
+                    ''
+                    );
+
+                    INSERT INTO ingredients (ingredient_name, ingredient_description)
+                    VALUES(
+                    'Marjoram',
+                    ''
+                    );
+
+                    INSERT INTO ingredients (ingredient_name, ingredient_description)
+                    VALUES(
+                    'Spaghetti',
+                    ''
+                    );
+
+                    INSERT INTO ingredients (ingredient_name, ingredient_description)
+                    VALUES(
+                    'Avocados',
+                    ''
+                    );
+
+                    INSERT INTO ingredients (ingredient_name, ingredient_description)
+                    VALUES(
+                    'Lime Juice',
+                    ''
+                    );
+
+                    INSERT INTO ingredients (ingredient_name, ingredient_description)
+                    VALUES(
+                    'Cilantro',
+                    ''
+                    );
+
+                    INSERT INTO ingredients (ingredient_name, ingredient_description)
+                    VALUES(
+                    'Chicken Thighs',
+                    ''
+                    );
+
+                    INSERT INTO ingredients (ingredient_name, ingredient_description)
+                    VALUES(
+                    'Chicken Broth',
+                    ''
+                    );
+
+                    INSERT INTO ingredients (ingredient_name, ingredient_description)
+                    VALUES(
+                    'Celery',
+                    ''
+                    );
+
+                    INSERT INTO ingredients (ingredient_name, ingredient_description)
+                    VALUES(
+                    'Carrots',
+                    ''
+                    );
+
+                    INSERT INTO ingredients (ingredient_name, ingredient_description)
+                    VALUES(
+                    'Egg Noodles',
+                    ''
+                    );
+
+                    INSERT INTO ingredients (ingredient_name, ingredient_description)
+                    VALUES(
+                    'Lemon Juice',
+                    ''
+                    );
+
+                    INSERT INTO ingredients (ingredient_name, ingredient_description)
+                    VALUES(
+                    'Bananas',
+                    ''
+                    );
+
+                    INSERT INTO ingredients (ingredient_name, ingredient_description)
+                    VALUES(
+                    'Buttermilk',
+                    ''
+                    );
+
+                    INSERT INTO ingredients (ingredient_name, ingredient_description)
+                    VALUES(
+                    'Walnuts',
+                    ''
+                    );
+
+
+                    INSERT INTO ingredients (ingredient_name, ingredient_description)
+                    VALUES(
+                    'Active Dry Yeast',
+                    ''
+                    );
+
+                    INSERT INTO ingredients (ingredient_name, ingredient_description)
+                    VALUES(
+                    'Cornmeal',
+                    ''
+                    );
+
+                    INSERT INTO ingredients (ingredient_name, ingredient_description)
+                    VALUES(
+                    'Seasoned Salt',
+                    ''
+                    );
+
+                    INSERT INTO ingredients (ingredient_name, ingredient_description)
+                    VALUES(
+                    'Baking Powder',
+                    ''
+                    );
+
+                    INSERT INTO ingredients (ingredient_name, ingredient_description)
+                    VALUES(
+                    'Shredded Mozzarella',
+                    ''
+                    );
+
+                    INSERT INTO ingredients (ingredient_name, ingredient_description)
+                    VALUES(
+                    'Sage',
+                    ''
+                    );
+                    """)
+    
+    # insert recipe line data into recipe_lines table
+    c.executescript("""
+                    INSERT INTO recipe_lines(recipe_id, ingredient_id, quantity)
+                    VALUES
+                    (1, 1, '1 cup'),
+                    (1, 2, '1 cup'),
+                    (1, 3, '1 cup'),
+                    (1, 4, '2 teaspoons'),
+                    (1, 5, '2 large'),
+                    (1, 7, '1 teaspoon'),
+                    (1, 9, '1 teaspoon'),
+                    (1, 56, '½ teaspoon'),
+                    (1, 10, '3 cups'),
+                    (1, 11, '2 cups'),
+
+                    (2, 21, '3 ounces'),
+                    (2, 22, '¾ cup'),
+                    (2, 57, '1 cup'),
+                    (2, 23, '1 cup'),
+                    (2, 24, '½ teaspoon'),
+                    (2, 25, '10 Slices (½ inch thick)'),
+                    (2, 1, '2 tablespoons'),
+
+                    (3, 5, '2 large'),
+                    (3, 6, '2 large'),
+                    (3, 7, '⅛ teaspoon'),
+                    (3, 8, '⅛ teaspoon'),
+                    (3, 1, '1 teaspoon'),
+                    (3, 12, '½ cup'),
+                    (3, 13, '½ cup'),
+                    (3, 14, '2 tablespoons'),
+
+                    (4, 15, '3½ pounds'),
+                    (4, 16, '1 small'),
+                    (4, 17, '2 cloves'),
+                    (4, 18, '2 tablespoons'),
+                    (4, 19, '2 tablespoons'),
+                    (4, 7, '1 teaspoon'),
+                    (4, 8, '¼ teaspoon'),
+                    (4, 20, '12 leaves'),
+                    
+                    (5, 1, '½ cup'),
+                    (5, 26, '¼ cup'),
+                    (5, 20, '2 tablespoons'),
+                    (5, 27, '1 tablespoon'),
+                    (5, 3, '3 cloves'),
+                    (5, 38, '1 baguette'),
+                    (5, 29, '4 ounces'),
+
+                    (6, 30, '2 pounds'),
+                    (6, 31, '¾ pound'),
+                    (6, 16, '4 medium'),
+                    (6, 17, '8 cloves'),
+                    (6, 32, '4 cans (14-½ ounces each)'),
+                    (6, 33, '4 cans (6 ounces each)'),
+                    (6, 34, '½ cup'),
+                    (6, 2, '¼ cup'),
+                    (6, 35, '¼ cup'),
+                    (6, 36, '1 tablespoon'),
+                    (6, 27, '¼ cup'),
+                    (6, 20, '2 tablespoons'),
+                    (6, 37, '1 tablespoon'),
+                    (6, 38, '4'),
+                    (6, 58, '1 teaspoon'),
+                    (6, 7, '½ teaspoon'),
+                    (6, 39, '½ teaspoon'),
+                    (6, 8, '½ teaspoon'),
+
+                    (7, 41, '3 medium'),
+                    (7, 17, '1 clove'),
+                    (7, 7, '¼-½ teaspoon'),
+                    (7, 16, '1 small'),
+                    (7, 42, '1-2 tablespoons'),
+                    (7, 43, '1 tablespoon'),
+                    (7, 15, '2 medium'),
+                    (7, 22, '¼ cup'),
+
+                    (8, 44, '2½ pounds (bone-in)'),
+                    (8, 7, '½ teaspoon'),
+                    (8, 8, '½ teaspoon'),
+                    (8, 36, '1 tablespoon'),
+                    (8, 16, '1 large'),
+                    (8, 17, '1 clove'),
+                    (8, 45, '10 cups'),
+                    (8, 46, '4 stalks'),
+                    (8, 47, '4 medium'),
+                    (8, 38, '2'),
+                    (8, 19, '1 teaspoon'),
+                    (8, 48, '3 cups'),
+                    (8, 27, '1 tablespoon'),
+                    (8, 49, '1 tablespoon'),
+
+                    (9, 10, '1¾ cups'),
+                    (9, 2, '1½ cups'),
+                    (9, 9, '1 teaspoon'),
+                    (9, 7, '½ teaspoon'),
+                    (9, 5, '2 large'),
+                    (9, 50, '2 medium'),
+                    (9, 36, '½ cup'),
+                    (9, 51, '¼ cup + 1 tablespoon'),
+                    (9, 4, '1 teaspoon'),
+                    (9, 52, '1 cup'),
+
+                    (10, 53, '1½ teaspoons'),
+                    (10, 34, '1¾ cups'),
+                    (10, 10, '3½ cups + 1 tablespoon'),
+                    (10, 7, '2 teaspoons'),
+                    (10, 54, '1 tablespoon'); 
+                    """)
 create_db()
 insert_data()
