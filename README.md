@@ -20,3 +20,7 @@ https://www.onceuponachef.com/inspiration/basic-recipes-everyone-should-know.htm
 https://www.tasteofhome.com/collection/essential-recipes-you-should-know-by-35/
 
 https://www.w3schools.com/sql/func_sqlserver_soundex.asp
+
+https://stackoverflow.com/questions/59823203/how-can-i-define-the-width-of-a-column-prettytable-python
+
+https://www.sqlite.org/spellfix1.html

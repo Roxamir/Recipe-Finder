@@ -193,6 +193,7 @@ Reduce oven setting to 450°. Remove foil; bake bread until deep golden brown, 2
                     );             
                     """)
     
+    
     # insert ingredient data into ingredients table
     c.executescript("""
                     INSERT INTO ingredients (ingredient_name, ingredient_description)
@@ -660,5 +661,10 @@ Although its primary flavor compound is vanillin, pure vanilla extract contains 
                     (10, 7, '2 teaspoons'),
                     (10, 54, '1 tablespoon'); 
                     """)
+
 create_db()
 insert_data()
+
+
+db.commit()
+db.close()

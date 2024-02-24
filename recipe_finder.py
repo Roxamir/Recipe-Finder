@@ -1,73 +1,66 @@
-import psycopg2
+import sqlite3
 import time
+from tkinter import ALL
+from prettytable import PrettyTable, ALL
 
-def ingredient_search(ingredient):    # connecting to the postgres server
-    db = psycopg2.connect(
-    database="recipe_finder",
-    host="localhost",
-    user="postgres",
-    password="cs361",
-    port="5432"
-    )
+def ingredient_search(ingredient):
+    # connecting to the database
+    db = sqlite3.connect("recipe_finder.db")
+    db.execute("PRAGMA foreign_keys = ON")
 
     # cursor object c
     c = db.cursor()
 
     # Ingredient Search SQL Query
-    query = ("SELECT ingredient_name, ingredient_description FROM ingredients WHERE ingredient_name ILIKE %s")
+    query = ("SELECT ingredient_name, ingredient_description FROM ingredients WHERE ingredient_name LIKE ? COLLATE NOCASE")
     
     # execute search query
-    c.execute(query, ("%" + ingredient + "%",))
+    c.execute(query, (ingredient,))
 
-    # searching animation
-    print("Searching")
-    for i in range(0,5):
-        time.sleep(1)
-        print("*")
+    # execute search query
+    results = c.execute(query, ("%" + ingredient + "%",))
 
-    # storing results and printing matching ingredients
-    results = c.fetchall()
-    for result in results:
-        print(result)
-        print("\n")
+    #format data with PrettyTable
+    table = PrettyTable()
+    table.hrules = ALL      # horizontal separators
+    table.field_names = ['Ingredient', 'Description']       # column titles
+    table._max_width = {"Ingredient" : 25, "Description" : 75} # max width for columns
+    table.align["Description"] = "l"    # left align description column
+    table.add_rows(results) # add rows to table
 
-    # closing the database connection
+    print(table)
+
     db.close()
 
 def recipe_search(recipe):
 
-    # connecting to the postgres server
-    db = psycopg2.connect(
-    database="recipe_finder",
-    host="localhost",
-    user="postgres",
-    password="cs361",
-    port="5432"
-    )
+    # connecting to the database
+    db = sqlite3.connect("recipe_finder.db")
+    db.execute("PRAGMA foreign_keys = ON")
 
     # cursor object c
     c = db.cursor()
 
     # Recipe Search SQL Query
-    query = ("SELECT recipe_name, recipe_description FROM recipes WHERE recipe_name ILIKE %s")
+    query = ("SELECT recipe_name, recipe_description FROM recipes WHERE recipe_name LIKE ? COLLATE NOCASE")
 
     # execute search query
-    c.execute(query, ("%" + recipe + "%",))
-
-    # searching animation
-    print("Searching")
-    for i in range(0,5):
-        time.sleep(1)
-        print("*")
-
-    # storing results and printing matching ingredients
-    results = c.fetchall()
-    for result in results:
-        print(result)
-        print("\n")
-
-    # closing the database connection
+    results = c.execute(query, ("%" + recipe + "%",))
+    
+   
+    #format data with PrettyTable
+    table = PrettyTable()
+    table.hrules = ALL      # horizontal separators
+    table.field_names = ['Recipe', 'Description']       # column titles
+    table._max_width = {"Recipe" : 25, "Description" : 75} # max width for columns
+    table.align["Description"] = "l"    # left align description column
+    table.add_rows(results) # add rows to table
+    print(table)
+    
     db.close()
+    
+    
+
 
 # initialize values
 cmd = 9
