@@ -24,3 +24,9 @@ https://www.w3schools.com/sql/func_sqlserver_soundex.asp
 https://stackoverflow.com/questions/59823203/how-can-i-define-the-width-of-a-column-prettytable-python
 
 https://www.sqlite.org/spellfix1.html
+
+https://zguide.zeromq.org/docs/
+
+https://stackoverflow.com/questions/9445370/lists-or-dicts-over-zeromq-in-python
+
+https://stackoverflow.com/questions/41918836/how-do-i-get-rid-of-the-b-prefix-in-a-string-in-python

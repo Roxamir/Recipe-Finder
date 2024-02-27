@@ -2,6 +2,7 @@ import sqlite3
 import time
 from tkinter import ALL
 from prettytable import PrettyTable, ALL
+import db_initialize
 
 def ingredient_search(ingredient):
     # connecting to the database
@@ -58,8 +59,57 @@ def recipe_search(recipe):
     print(table)
     
     db.close()
+
+def favorite_recipes():
+    # connecting to the database
+    db = sqlite3.connect("recipe_finder.db")
+    db.execute("PRAGMA foreign_keys = ON")
+
+    # cursor object c
+    c = db.cursor()
+
+    fav_cmd = 9
+
+    print("~~~~~~~ FAVORITES ~~~~~~~")
+
+    print("""
+          Please select an option:
+          
+          [1] View Favorites
+          [2] Add Favorite
+          [3] Remove Favorite
+
+          [0] Return to Main Menu
+
+
+          """)
+    while fav_cmd != 0:
+
+        fav_cmd = input("Input a number, then press ENTER: ")
     
-    
+        print("\nYou selected option " + str(fav_cmd) + ". Is this correct?")
+        fav_confirm = input("\nPress ENTER to continue or type 'NO' to select again: ")
+
+        if fav_confirm == 'NO':
+            # reset variables
+            fav_confirm = 'YES'
+            fav_cmd = 9
+        
+        # view favorites
+        if fav_cmd == 1:
+            
+
+
+
+
+
+
+def recipe_add():
+    print("""
+          Hello! Welcome to the Add Recipe Wizard.
+          Follow the prompts to add a recipe.
+          To exit the wizard, type EXIT at any prompt.
+          """)  
 
 
 # initialize values
@@ -76,7 +126,7 @@ while cmd != 0:
           
       """)
     # user input for cmd
-    cmd = int(input("Input a number then press 'ENTER': "))
+    cmd = int(input("Input a number, then press 'ENTER': "))
 
     # confirmation that correct option was selected
     print("\nYou selected option " + str(cmd) + ". Is this correct?")
@@ -100,3 +150,6 @@ while cmd != 0:
     # invalid input, program restarted.
     else:
         print("\nInvalid input. Please try again.")
+
+    # reset variable
+    cmd = 9
