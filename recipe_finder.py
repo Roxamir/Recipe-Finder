@@ -59,8 +59,18 @@ def recipe_search(recipe):
     print(table)
     
     db.close()
+            
 
-def favorite_recipes():
+def recipe_add():
+    print("""
+          Hello! Welcome to the Add Ingredient Wizard.
+          Follow the prompts to add an ingredient.
+          To exit the wizard, type EXIT at any prompt.
+          """) 
+
+    added_ingredient = input("Enter an ingredient name to add: ")
+
+    # query database to check for ingredient
     # connecting to the database
     db = sqlite3.connect("recipe_finder.db")
     db.execute("PRAGMA foreign_keys = ON")
@@ -68,61 +78,67 @@ def favorite_recipes():
     # cursor object c
     c = db.cursor()
 
-    fav_cmd = 9
+    query = ("SELECT ingredient_name, ingredient_description FROM ingredients WHERE ingredient_name LIKE ? COLLATE NOCASE")
 
-    print("~~~~~~~ FAVORITES ~~~~~~~")
+    ingredient_check = c.execute(query, ("%" + added_ingredient + "%",))
 
-    print("""
-          Please select an option:
-          
-          [1] View Favorites
-          [2] Add Favorite
-          [3] Remove Favorite
+    # if similar ingredient is found, check with user if ingredient is in db
+    if ingredient_check.fetchone() != None:
+        table = PrettyTable()
+        table.hrules = ALL      # horizontal separators
+        table.field_names = ['Ingredient', 'Description']       # column titles
+        table._max_width = {"Ingredient" : 25, "Description" : 75} # max width for columns
+        table.align["Description"] = "l"    # left align description column
+        table.add_rows(ingredient_check) # add rows to table
+        print("""
+              
+              It looks like we found some similar ingredients. Do you mean any of these ingredients?
+              
+              """)
+        print(table)
 
-          [0] Return to Main Menu
+        confirm = input("Type 'YES' if ingredient exists in database, otherwise ingredient addition will continue: ")
 
-
-          """)
-    while fav_cmd != 0:
-
-        fav_cmd = input("Input a number, then press ENTER: ")
+        if confirm == 'YES':
+            return
     
-        print("\nYou selected option " + str(fav_cmd) + ". Is this correct?")
-        fav_confirm = input("\nPress ENTER to continue or type 'NO' to select again: ")
 
-        if fav_confirm == 'NO':
-            # reset variables
-            fav_confirm = 'YES'
-            fav_cmd = 9
-        
-        # view favorites
-        if fav_cmd == 1:
-            
+    ingredient_description = input("Please input a description for the ingredient (optional): ")
+
+    insert_query = ("INSERT INTO ingredients (ingredient_name, ingredient_description) VALUES (?, ?)")
 
 
 
+    # insert ingredient into db
+    c.execute(insert_query, (added_ingredient, ingredient_description))
+    db.commit()
+    db.close()
 
-
-
-def recipe_add():
     print("""
-          Hello! Welcome to the Add Recipe Wizard.
-          Follow the prompts to add a recipe.
-          To exit the wizard, type EXIT at any prompt.
-          """)  
+          
+          Ingredient has been successfully added.
+          
+          """)
 
 
+    
+
+
+# ~~~~~~~~~~~~~~~~~~~~~~~ MAIN PROGRAM ~~~~~~~~~~~~~~~~~~~~~~~
 # initialize values
 cmd = 9
 
 while cmd != 0:
     # welcome message and cmd prompts
     print("""
-    Hello. Welcome to Recipe Finder v0.1. Please select an option:
-    
-    [1] Search for recipe
-    [2] Search for ingredient
-    [0] EXIT
+          Hello. Welcome to Recipe Finder v0.1. Please select an option:
+          [1] Search for recipe
+          [2] Search for ingredient
+          [3] Add ingredient to database
+          [4] Add recipe to database
+          [5] View recipe
+          [6] Favorites
+          [0] EXIT
           
       """)
     # user input for cmd
