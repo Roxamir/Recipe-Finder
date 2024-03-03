@@ -8,6 +8,7 @@ def loading_animation(x):
     for i in range(x):
         time.sleep(1)
         print("*")
+
 def ingredient_search(ingredient):
     # connecting to the database
     db = sqlite3.connect("recipe_finder.db")
@@ -25,6 +26,12 @@ def ingredient_search(ingredient):
     # execute search query
     results = c.execute(query, ("%" + ingredient + "%",))
 
+    # check if ingredient exists in DB
+    if c.fetchone() == None:
+        loading_animation(2)
+        print("Sorry. No ingredients with the word '" + ingredient + "' are found in the database. Please try again.")
+        return
+
     #format data with PrettyTable
     table = PrettyTable()
     table.hrules = ALL      # horizontal separators
@@ -33,6 +40,8 @@ def ingredient_search(ingredient):
     table.align["Description"] = "l"    # left align description column
     table.add_rows(results) # add rows to table
 
+    print("Here are the ingredients that contain the word '" + ingredient + "'.")
+    loading_animation(2)
     print(table)
 
     db.close()
@@ -51,6 +60,12 @@ def recipe_search(recipe):
 
     # execute search query
     results = c.execute(query, ("%" + recipe + "%",))
+
+    # check if recipe exists in DB.
+    if c.fetchone() == None:
+        loading_animation(2)
+        print("Sorry. No recipes with the word '" + recipe + "' are found in the database. Please try again.")
+        return
     
    
     #format data with PrettyTable
@@ -60,20 +75,15 @@ def recipe_search(recipe):
     table._max_width = {"Recipe" : 25, "Description" : 75} # max width for columns
     table.align["Description"] = "l"    # left align description column
     table.add_rows(results) # add rows to table
+
+    print("Here are the recipes that contain the word '" + recipe + "'.")
+    loading_animation(3)
     print(table)
     
     db.close()           
 
-def ingredient_add():
-    print("""
-          
-          Hello! Welcome to the Add Ingredient Wizard.
-          Follow the prompts to add an ingredient.
-
-          """) 
-
-    added_ingredient = input("Enter an ingredient name to add: ")
-
+def ingredient_add(added_ingredient):
+    
     # query database to check for ingredient
     # connecting to the database
     db = sqlite3.connect("recipe_finder.db")
@@ -208,7 +218,7 @@ def recipe_view():
 # ~~~~~~~~~~~~~~~~~~~~~~~ MAIN PROGRAM ~~~~~~~~~~~~~~~~~~~~~~~
 # initialize values
 cmd = 9
-
+loading_animation(2)
 while cmd != 0:
     # welcome message and cmd prompts
     print("""
@@ -223,28 +233,42 @@ while cmd != 0:
           
       """)
     # user input for cmd
+    loading_animation(2)
     cmd = int(input("Input a number, then press 'ENTER': "))
     loading_animation(2)
 
     # confirmation that correct option was selected
-    print("\nYou selected option " + str(cmd) + ". Is this correct?")
-    loading_animation(5)
-    confirm = input("\nPress enter to continue or type 'RESTART' to restart program: \n")
+    print("You selected option " + str(cmd) + ". Is this correct?")
+    loading_animation(2)
+    confirm = input("Press enter to continue or type 'RESTART' to restart program: ")
     if confirm == "RESTART":
         cmd = 9
 
     # recipe search selected
     elif cmd == 1:
-        recipe = input("\nPlease input recipe: ")
+        loading_animation(2)
+        recipe = input("Please input recipe: ")
+        loading_animation(2)
         recipe_search(recipe)
 
     # ingredient search selected
     elif cmd == 2:
-        ingredient = input("\nPlease input ingredient: ")
+        loading_animation(2)
+        ingredient = input("Please input ingredient: ")
+        loading_animation(2)
         ingredient_search(ingredient)
 
+    # add ingredient selected
+    elif cmd == 3:
+        loading_animation(2)
+        added_ingredient = input("Enter an ingredient name to add: ")
+        loading_animation(2)
+        ingredient_add(added_ingredient)
+
+    # view recipe selected
     elif cmd == 5:
         recipe_view()
+
     # exit selected
     elif cmd == 0:
         loading_animation(2)
@@ -253,10 +277,11 @@ while cmd != 0:
             Now exiting...
             """)
         loading_animation(2)
+
     # invalid input, program restarted.
     else:
         loading_animation(2)
-        print("\nInvalid input. Please try again.")
+        print("Invalid input. Please try again.")
         loading_animation(2)
         # reset variable
         cmd = 9
