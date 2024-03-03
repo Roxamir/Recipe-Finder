@@ -1,9 +1,13 @@
+from re import T
 import sqlite3
 import time
 from tkinter import ALL
 from prettytable import PrettyTable, ALL
 import db_initialize
-
+def loading_animation(x):
+    for i in range(x):
+        time.sleep(1)
+        print("*")
 def ingredient_search(ingredient):
     # connecting to the database
     db = sqlite3.connect("recipe_finder.db")
@@ -58,14 +62,14 @@ def recipe_search(recipe):
     table.add_rows(results) # add rows to table
     print(table)
     
-    db.close()
-            
+    db.close()           
 
-def recipe_add():
+def ingredient_add():
     print("""
+          
           Hello! Welcome to the Add Ingredient Wizard.
           Follow the prompts to add an ingredient.
-          To exit the wizard, type EXIT at any prompt.
+
           """) 
 
     added_ingredient = input("Enter an ingredient name to add: ")
@@ -120,8 +124,85 @@ def recipe_add():
           
           """)
 
+def recipe_view():
+    # connecting to the database
+    db = sqlite3.connect("recipe_finder.db")
+    db.execute("PRAGMA foreign_keys = ON")
+
+    # cursor object c
+    c = db.cursor()
+
+    recipes = c.execute("SELECT recipe_id, recipe_name, recipe_description FROM recipes")
+
+    print("Select an ID from the following recipes in the database.")
+    loading_animation(5)
+    # table to display data
+    recipe_table = PrettyTable()
+    recipe_table.hrules = ALL      # horizontal separators
+    recipe_table.field_names = ['ID', 'Recipe', 'Description']       # column titles
+    recipe_table._max_width = {"ID" : 10, "Recipe" : 25, "Description" : 75} # max width for columns
+    recipe_table.align["Description"] = "l"    # left align description column
+    recipe_table.add_rows(recipes)
+    print(recipe_table)
+
+    loading_animation(5)
+    recipe_id = input("Please input a recipe ID to view the recipe: ")
+
+    # query for recipe name
+    name_query = ("SELECT recipe_name FROM recipes WHERE recipe_id = ?")
+    recipe_name = c.execute(name_query, (recipe_id,))
+    recipe_name = c.fetchone()
+
+    # if recipe does not exist, rerun recipe_view
+    if recipe_name == None:
+       loading_animation(5)
+       print("The recipe you entered does not seem to be in the database. Please check the previous input and try again.")
+       return
+    else:
+        recipe_name = recipe_name[0]
+    # query for recipe instructions
+    instructions_query = ("SELECT recipe_instructions FROM recipes WHERE recipe_id = ?")
+    instructions = c.execute(instructions_query, (recipe_id,))
+    instructions = c.fetchone()[0]
+
+    # query for source
+    source_query = ("Select recipe_source FROM recipes WHERE recipe_id = ?")
+    source = c.execute(source_query, (recipe_id,))
+    source = c.fetchone()[0]
+
+    # query for ingredients line
+    line_query = ("SELECT recipe_lines.quantity, ingredients.ingredient_name FROM recipe_lines INNER JOIN ingredients ON recipe_lines.ingredient_id = ingredients.ingredient_id WHERE recipe_lines.recipe_id = ?")
+    recipe_lines = c.execute(line_query, (recipe_id,))
+
+    line_table = PrettyTable()
+    line_table.hrules = ALL      # horizontal separators
+    line_table.field_names = ['Quantity', 'Ingredient']       # column titles
+    line_table._max_width = {"Quantity" : 50, "Ingredient" : 50} # max width for columns
+    line_table.align["Ingredient"] = "l"    # left align ingredient column
+    line_table.add_rows(recipe_lines)
+
+    loading_animation(5)
+
+    print("You selected the recipe '" + recipe_name + "'. Here are the ingredients" )
+    loading_animation(2)
+    print(line_table)
+    loading_animation(5)
+
+    print("Here are the instructions: ")
+    loading_animation(2)
+    print(instructions)
+
+    loading_animation(5)
+
+    print("For more information, visit the recipe source: ")
+    loading_animation(2)
+    print(source)
+
+    db.close()
+    
 
     
+
 
 
 # ~~~~~~~~~~~~~~~~~~~~~~~ MAIN PROGRAM ~~~~~~~~~~~~~~~~~~~~~~~
@@ -143,29 +224,39 @@ while cmd != 0:
       """)
     # user input for cmd
     cmd = int(input("Input a number, then press 'ENTER': "))
+    loading_animation(2)
 
     # confirmation that correct option was selected
     print("\nYou selected option " + str(cmd) + ". Is this correct?")
-    confirm = input("\nPress enter to continue or type 'RESTART' to restart program: ")
+    loading_animation(5)
+    confirm = input("\nPress enter to continue or type 'RESTART' to restart program: \n")
     if confirm == "RESTART":
-        cmd == 9
+        cmd = 9
+
     # recipe search selected
     elif cmd == 1:
         recipe = input("\nPlease input recipe: ")
         recipe_search(recipe)
+
     # ingredient search selected
     elif cmd == 2:
         ingredient = input("\nPlease input ingredient: ")
         ingredient_search(ingredient)
+
+    elif cmd == 5:
+        recipe_view()
     # exit selected
     elif cmd == 0:
+        loading_animation(2)
         print("""
             Thank you for using Recipe Finder
             Now exiting...
             """)
+        loading_animation(2)
     # invalid input, program restarted.
     else:
+        loading_animation(2)
         print("\nInvalid input. Please try again.")
-
-    # reset variable
-    cmd = 9
+        loading_animation(2)
+        # reset variable
+        cmd = 9
