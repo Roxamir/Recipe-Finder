@@ -1,9 +1,12 @@
+
 from re import T
 import sqlite3
 import time
 from tkinter import ALL
+from numpy import add, empty
 from prettytable import PrettyTable, ALL
 import db_initialize
+
 def loading_animation(x):
     for i in range(x):
         time.sleep(1)
@@ -19,18 +22,15 @@ def ingredient_search(ingredient):
 
     # Ingredient Search SQL Query
     query = ("SELECT ingredient_name, ingredient_description FROM ingredients WHERE ingredient_name LIKE ? COLLATE NOCASE")
-    
-    # execute search query
-    c.execute(query, (ingredient,))
-
-    # execute search query
-    results = c.execute(query, ("%" + ingredient + "%",))
 
     # check if ingredient exists in DB
+    results = c.execute(query, ("%" + ingredient + "%",))
     if c.fetchone() == None:
         loading_animation(2)
         print("Sorry. No ingredients with the word '" + ingredient + "' are found in the database. Please try again.")
         return
+
+    results = c.execute(query, ("%" + ingredient + "%",))
 
     #format data with PrettyTable
     table = PrettyTable()
@@ -43,6 +43,7 @@ def ingredient_search(ingredient):
     print("Here are the ingredients that contain the word '" + ingredient + "'.")
     loading_animation(2)
     print(table)
+    loading_animation(2)
 
     db.close()
 
@@ -58,27 +59,28 @@ def recipe_search(recipe):
     # Recipe Search SQL Query
     query = ("SELECT recipe_name, recipe_description FROM recipes WHERE recipe_name LIKE ? COLLATE NOCASE")
 
-    # execute search query
-    results = c.execute(query, ("%" + recipe + "%",))
-
     # check if recipe exists in DB.
+    results = c.execute(query, ("%" + recipe + "%",))
     if c.fetchone() == None:
         loading_animation(2)
         print("Sorry. No recipes with the word '" + recipe + "' are found in the database. Please try again.")
         return
     
+    # execute search query to display results
+    results = c.execute(query, ("%" + recipe + "%",))
    
     #format data with PrettyTable
     table = PrettyTable()
     table.hrules = ALL      # horizontal separators
     table.field_names = ['Recipe', 'Description']       # column titles
-    table._max_width = {"Recipe" : 25, "Description" : 75} # max width for columns
+    table._max_width = {"Recipe" : 50, "Description" : 100} # max width for columns
     table.align["Description"] = "l"    # left align description column
     table.add_rows(results) # add rows to table
 
     print("Here are the recipes that contain the word '" + recipe + "'.")
-    loading_animation(3)
+    loading_animation(2)
     print(table)
+    loading_animation(2)
     
     db.close()           
 
@@ -103,6 +105,7 @@ def ingredient_add(added_ingredient):
         table.field_names = ['Ingredient', 'Description']       # column titles
         table._max_width = {"Ingredient" : 25, "Description" : 75} # max width for columns
         table.align["Description"] = "l"    # left align description column
+        ingredient_check = c.execute(query, ("%" + added_ingredient + "%",))
         table.add_rows(ingredient_check) # add rows to table
         print("""
               
@@ -133,6 +136,7 @@ def ingredient_add(added_ingredient):
           Ingredient has been successfully added.
           
           """)
+    loading_animation(2)
 
 def recipe_view():
     # connecting to the database
@@ -163,7 +167,7 @@ def recipe_view():
     recipe_name = c.execute(name_query, (recipe_id,))
     recipe_name = c.fetchone()
 
-    # if recipe does not exist, rerun recipe_view
+    # if recipe does not exist, exit
     if recipe_name == None:
        loading_animation(5)
        print("The recipe you entered does not seem to be in the database. Please check the previous input and try again.")
@@ -210,78 +214,247 @@ def recipe_view():
 
     db.close()
     
+def show_favorites():
 
+    # connecting to the database
+    db = sqlite3.connect("recipe_finder.db")
+    db.execute("PRAGMA foreign_keys = ON")
+
+    # cursor object c
+    c = db.cursor()
+        
+    favorites = []
+    # open favorites and store numbers into array
+    with open('favorites.txt', 'r') as file:
+        lines = file.readlines()
+        for line in lines:
+            favorites.append(int(line.replace("\n", "")))
+
+    # table to display favorites
+    fav_table = PrettyTable()
+    fav_table.hrules = ALL      # horizontal separators
+    fav_table.field_names = ['ID', 'Recipe', 'Description']       # column titles
+    fav_table._max_width = {"ID" : 10, "Recipe" : 25, "Description" : 75} # max width for columns
+    fav_table.align["Description"] = "l"    # left align description column
+
+    for favorite in favorites:
+        fav_recipe = c.execute("SELECT recipe_id, recipe_name, recipe_description FROM recipes WHERE recipe_id = ?", (favorite,))
+        fav_table.add_rows(fav_recipe)
+
+    print(fav_table)
+
+    return favorites
+
+def favorites():
+
+    fav_cmd = ""
     
-
-
-
-# ~~~~~~~~~~~~~~~~~~~~~~~ MAIN PROGRAM ~~~~~~~~~~~~~~~~~~~~~~~
-# initialize values
-cmd = 9
-loading_animation(2)
-while cmd != 0:
-    # welcome message and cmd prompts
-    print("""
-          Hello. Welcome to Recipe Finder v0.1. Please select an option:
-          [1] Search for recipe
-          [2] Search for ingredient
-          [3] Add ingredient to database
-          [4] Add recipe to database
-          [5] View recipe
-          [6] Favorites
-          [0] EXIT
-          
-      """)
-    # user input for cmd
-    loading_animation(2)
-    cmd = int(input("Input a number, then press 'ENTER': "))
-    loading_animation(2)
-
-    # confirmation that correct option was selected
-    print("You selected option " + str(cmd) + ". Is this correct?")
-    loading_animation(2)
-    confirm = input("Press enter to continue or type 'RESTART' to restart program: ")
-    if confirm == "RESTART":
-        cmd = 9
-
-    # recipe search selected
-    elif cmd == 1:
-        loading_animation(2)
-        recipe = input("Please input recipe: ")
-        loading_animation(2)
-        recipe_search(recipe)
-
-    # ingredient search selected
-    elif cmd == 2:
-        loading_animation(2)
-        ingredient = input("Please input ingredient: ")
-        loading_animation(2)
-        ingredient_search(ingredient)
-
-    # add ingredient selected
-    elif cmd == 3:
-        loading_animation(2)
-        added_ingredient = input("Enter an ingredient name to add: ")
-        loading_animation(2)
-        ingredient_add(added_ingredient)
-
-    # view recipe selected
-    elif cmd == 5:
-        recipe_view()
-
-    # exit selected
-    elif cmd == 0:
-        loading_animation(2)
+    while fav_cmd != "0": 
         print("""
-            Thank you for using Recipe Finder
-            Now exiting...
-            """)
+              FAVORITES MENU
+              [1] View Favorites
+              [2] Add recipe to Favorites
+              [3] Remove recipe from Favorites
+              
+              
+              [0] EXIT Favorites
+
+          """)
+
+        fav_cmd = input("Input a number, then press enter: ")
+
+        if fav_cmd == "1":
+            favorites = show_favorites()
+            print("""
+                  To view a favorite recipe, enter the correct ID and press enter.
+                  Otherwise, program will return to Favorites Menu.
+                  """)
+
+            view_fav = input("Enter an ID, or return to Favorites Menu: ")
+
+            # check if input is correct format
+            if view_fav.isdigit():
+                view_fav = int(view_fav)
+
+                # check if ID is in favorites
+                if view_fav in favorites:
+                    # connecting to the database
+                    db = sqlite3.connect("recipe_finder.db")
+                    db.execute("PRAGMA foreign_keys = ON")
+
+                    # cursor object c
+                    c = db.cursor()
+                    # query for recipe name
+                    name_query = ("SELECT recipe_name FROM recipes WHERE recipe_id = ?")
+                    recipe_name = c.execute(name_query, (view_fav,))
+                    recipe_name = c.fetchone()[0]
+
+                    # query for recipe instructions
+                    instructions_query = ("SELECT recipe_instructions FROM recipes WHERE recipe_id = ?")
+                    instructions = c.execute(instructions_query, (view_fav,))
+                    instructions = c.fetchone()[0]
+
+                    # query for source
+                    source_query = ("Select recipe_source FROM recipes WHERE recipe_id = ?")
+                    source = c.execute(source_query, (view_fav,))
+                    source = c.fetchone()[0]
+
+                    # query for ingredients line
+                    line_query = ("SELECT recipe_lines.quantity, ingredients.ingredient_name FROM recipe_lines INNER JOIN ingredients ON recipe_lines.ingredient_id = ingredients.ingredient_id WHERE recipe_lines.recipe_id = ?")
+                    recipe_lines = c.execute(line_query, (view_fav,))
+
+                    line_table = PrettyTable()
+                    line_table.hrules = ALL      # horizontal separators
+                    line_table.field_names = ['Quantity', 'Ingredient']       # column titles
+                    line_table._max_width = {"Quantity" : 50, "Ingredient" : 50} # max width for columns
+                    line_table.align["Ingredient"] = "l"    # left align ingredient column
+                    line_table.add_rows(recipe_lines)
+
+                    # loading_animation(5)
+
+                    print("You selected the recipe '" + recipe_name + "'. Here are the ingredients" )
+                    #loading_animation(2)
+                    print(line_table)
+                    #loading_animation(5)
+
+                    print("Here are the instructions: ")
+                    #loading_animation(2)
+                    print(instructions)
+
+                    #loading_animation(5)
+
+                    print("For more information, visit the recipe source: ")
+                    #loading_animation(2)
+                    print(source)
+
+                else:
+                    print("It seems that the ID input is not in your favorites. Please check input and try again.")
+                
+            else:
+                print("It seems that the ID input is not in your favorites. Please check input and try again.")
+                fav_cmd = ""
+        
+        if fav_cmd == "2":
+            favorites = show_favorites()
+            print("""
+                  As a reminder, these are your current favorites.
+                  To add a favorite please input a recipe ID:
+                  """)
+
+            add_fav = input("Input an ID to add to your favorites: ")
+            if add_fav.isdigit():
+                add_fav = int(add_fav)
+                if add_fav not in favorites:
+                    favorites.append(add_fav)
+                    with open("favorites.txt", 'w+') as file:
+                        for favorite in favorites:
+                            file.write(str(favorite) + "\n")
+                    print("Favorite added! Here are your new favorites.")
+                    show_favorites()
+
+                else:
+                    print("Entered ID is alread in your favorites. Please check input and try again.")
+            else:
+                print("Invalid input. Please try again.")
+                
+        # remove favorite
+        if fav_cmd == "3":
+            favorites = show_favorites()
+            print("""
+                  As a reminder, these are your current favorites.
+                  To remove a favorite please input a recipe ID:
+                  """)
+
+            add_fav = input("Input an ID to remove from your favorites: ")
+            if add_fav.isdigit():
+                add_fav = int(add_fav)
+                if add_fav in favorites:
+                    favorites.remove(add_fav)
+                    with open("favorites.txt", 'w+') as file:
+                        for favorite in favorites:
+                            file.write(str(favorite) + "\n")
+                    print("Favorite removed! Here are your new favorites.")
+                    show_favorites()
+
+                else:
+                    print("Entered ID is already in your favorites. Please check input and try again.")
+            else:
+                print("Invalid input. Please try again.")
+# ~~~~~~~~~~~~~~~~~~~~~~~ MAIN PROGRAM ~~~~~~~~~~~~~~~~~~~~~~~ #
+# initialize values
+if __name__ == '__main__':
+
+    cmd = ""
+    loading_animation(2)
+    while cmd != "0":
+
+        # reset command after each function
+        cmd = ""
+        
+        # welcome message and cmd prompts
+        print("""
+            Hello. Welcome to Recipe Finder v0.1. Please select an option:
+
+            [1] Search for recipe
+            [2] Search for ingredient
+            [3] Add ingredient to database
+            [4] Add recipe to database
+            [5] View recipe
+            [6] Favorites
+            [0] EXIT
+            
+        """)
+        # user input for cmd
+        loading_animation(2)
+        cmd = input("Input a number, then press 'ENTER': ")
         loading_animation(2)
 
-    # invalid input, program restarted.
-    else:
+        # confirmation that correct option was selected
+        print("You selected option " + cmd + ". Is this correct?")
         loading_animation(2)
-        print("Invalid input. Please try again.")
-        loading_animation(2)
-        # reset variable
-        cmd = 9
+        confirm = input("Press enter to continue or type 'RESTART' to restart program: ")
+        if confirm == "RESTART":
+            cmd = ""
+
+        # recipe search selected
+        elif cmd == "1":
+            loading_animation(2)
+            recipe = input("Please input recipe: ")
+            loading_animation(2)
+            recipe_search(recipe)
+
+        # ingredient search selected
+        elif cmd == "2":
+            loading_animation(2)
+            ingredient = input("Please input ingredient: ")
+            loading_animation(2)
+            ingredient_search(ingredient)
+
+        # add ingredient selected
+        elif cmd == "3":
+            loading_animation(2)
+            added_ingredient = input("Enter an ingredient name to add: ")
+            loading_animation(2)
+            ingredient_add(added_ingredient)
+
+        # view recipe selected
+        elif cmd == "5":
+            recipe_view()
+
+        elif cmd == "6":
+            favorites()
+
+        # exit selected
+        elif cmd == "0":
+            loading_animation(2)
+            print("""
+                Thank you for using Recipe Finder
+                Now exiting...
+                """)
+            loading_animation(2)
+
+        # invalid input, program restarted.
+        else:
+            loading_animation(2)
+            print("Invalid input. Please try again.")
+            loading_animation(2)
