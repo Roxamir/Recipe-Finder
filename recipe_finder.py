@@ -1,4 +1,5 @@
 
+
 from re import T
 import sqlite3
 import time
@@ -228,7 +229,8 @@ def show_favorites():
     with open('favorites.txt', 'r') as file:
         lines = file.readlines()
         for line in lines:
-            favorites.append(int(line.replace("\n", "")))
+            if line.replace("\n", "").isdigit():
+                favorites.append(int(line.replace("\n", "")))
 
     # table to display favorites
     fav_table = PrettyTable()
@@ -345,18 +347,16 @@ def favorites():
             if add_fav.isdigit():
                 add_fav = int(add_fav)
                 if add_fav not in favorites:
-                    favorites.append(add_fav)
                     with open("favorites.txt", 'w+') as file:
-                        for favorite in favorites:
-                            file.write(str(favorite) + "\n")
-                    print("Favorite added! Here are your new favorites.")
+                        file.write("ADD\n" + str(add_fav))
+                    print("Favorite added!")
                     show_favorites()
 
                 else:
                     print("Entered ID is alread in your favorites. Please check input and try again.")
             else:
                 print("Invalid input. Please try again.")
-                
+
         # remove favorite
         if fav_cmd == "3":
             favorites = show_favorites()
@@ -365,15 +365,13 @@ def favorites():
                   To remove a favorite please input a recipe ID:
                   """)
 
-            add_fav = input("Input an ID to remove from your favorites: ")
-            if add_fav.isdigit():
-                add_fav = int(add_fav)
-                if add_fav in favorites:
-                    favorites.remove(add_fav)
+            remove_fav = input("Input an ID to remove from your favorites: ")
+            if remove_fav.isdigit():
+                remove_fav = int(remove_fav)
+                if remove_fav in favorites:
                     with open("favorites.txt", 'w+') as file:
-                        for favorite in favorites:
-                            file.write(str(favorite) + "\n")
-                    print("Favorite removed! Here are your new favorites.")
+                        file.write("REMOVE\n" + str(remove_fav))
+                    print("Favorite removed!")
                     show_favorites()
 
                 else:
