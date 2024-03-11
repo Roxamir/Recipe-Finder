@@ -55,3 +55,5 @@ https://stackoverflow.com/questions/9445370/lists-or-dicts-over-zeromq-in-python
 https://stackoverflow.com/questions/41918836/how-do-i-get-rid-of-the-b-prefix-in-a-string-in-python
 
 https://www.sqlitetutorial.net/sqlite-exists/
+
+https://tutorpython.com/tutorial/readlines-without-newline

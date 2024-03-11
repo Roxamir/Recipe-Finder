@@ -12,6 +12,31 @@ def loading_animation(x):
     for i in range(x):
         time.sleep(1)
         print("*")
+def show_ingredients():
+    # connecting to the database
+    db = sqlite3.connect("recipe_finder.db")
+    db.execute("PRAGMA foreign_keys = ON")
+
+    # cursor object c
+    c = db.cursor()
+
+    # Select all Names and Descriptions from ingredients
+    ingredients = c.execute("SELECT ingredient_id, ingredient_name, ingredient_description FROM ingredients")
+
+    #format data with PrettyTable
+    table = PrettyTable()
+    table.hrules = ALL      # horizontal separators
+    table.field_names = ['ID','Ingredient', 'Description']       # column titles
+    table._max_width = {"ID": 10, "Ingredient" : 25, "Description" : 75} # max width for columns
+    table.align["Description"] = "l"    # left align description column
+    table.add_rows(ingredients) # add rows to table
+
+    print("Here are all the ingredients in the database: ")
+    loading_animation(2)
+    print(table)
+    loading_animation(2)
+
+    db.close()
 
 def ingredient_search(ingredient):
     # connecting to the database
@@ -47,43 +72,6 @@ def ingredient_search(ingredient):
     loading_animation(2)
 
     db.close()
-
-def recipe_search(recipe):
-
-    # connecting to the database
-    db = sqlite3.connect("recipe_finder.db")
-    db.execute("PRAGMA foreign_keys = ON")
-
-    # cursor object c
-    c = db.cursor()
-
-    # Recipe Search SQL Query
-    query = ("SELECT recipe_name, recipe_description FROM recipes WHERE recipe_name LIKE ? COLLATE NOCASE")
-
-    # check if recipe exists in DB.
-    results = c.execute(query, ("%" + recipe + "%",))
-    if c.fetchone() == None:
-        loading_animation(2)
-        print("Sorry. No recipes with the word '" + recipe + "' are found in the database. Please try again.")
-        return
-    
-    # execute search query to display results
-    results = c.execute(query, ("%" + recipe + "%",))
-   
-    #format data with PrettyTable
-    table = PrettyTable()
-    table.hrules = ALL      # horizontal separators
-    table.field_names = ['Recipe', 'Description']       # column titles
-    table._max_width = {"Recipe" : 50, "Description" : 100} # max width for columns
-    table.align["Description"] = "l"    # left align description column
-    table.add_rows(results) # add rows to table
-
-    print("Here are the recipes that contain the word '" + recipe + "'.")
-    loading_animation(2)
-    print(table)
-    loading_animation(2)
-    
-    db.close()           
 
 def ingredient_add(added_ingredient):
     
@@ -138,6 +126,57 @@ def ingredient_add(added_ingredient):
           
           """)
     loading_animation(2)
+
+def ingredient_remove():
+    for i in range(3):
+        print("""
+              *** WARNING ***
+              """)
+    print("""
+          PLEASE READ:
+          DELETING AN INGREDIENT WILL ALSO DELETE THE RECIPE LINES ASSOCIATED WITH THAT INGREDIENT!!!
+          ENSURE THAT INGREDIENT IS NOT PRESENT IN ANY RECIPES BEFORE DELETING!!!
+          """)
+    
+    show_ingredients()
+    removed_ingredient = input("Please enter ingredient ID of ingredient you wish to delete: ")
+    
+def recipe_search(recipe):
+
+    # connecting to the database
+    db = sqlite3.connect("recipe_finder.db")
+    db.execute("PRAGMA foreign_keys = ON")
+
+    # cursor object c
+    c = db.cursor()
+
+    # Recipe Search SQL Query
+    query = ("SELECT recipe_name, recipe_description FROM recipes WHERE recipe_name LIKE ? COLLATE NOCASE")
+
+    # check if recipe exists in DB.
+    results = c.execute(query, ("%" + recipe + "%",))
+    if c.fetchone() == None:
+        loading_animation(2)
+        print("Sorry. No recipes with the word '" + recipe + "' are found in the database. Please try again.")
+        return
+    
+    # execute search query to display results
+    results = c.execute(query, ("%" + recipe + "%",))
+   
+    #format data with PrettyTable
+    table = PrettyTable()
+    table.hrules = ALL      # horizontal separators
+    table.field_names = ['Recipe', 'Description']       # column titles
+    table._max_width = {"Recipe" : 50, "Description" : 100} # max width for columns
+    table.align["Description"] = "l"    # left align description column
+    table.add_rows(results) # add rows to table
+
+    print("Here are the recipes that contain the word '" + recipe + "'.")
+    loading_animation(2)
+    print(table)
+    loading_animation(2)
+    
+    db.close()           
 
 def recipe_view():
     # connecting to the database
@@ -215,6 +254,51 @@ def recipe_view():
 
     db.close()
     
+def recipe_add():
+    # connecting to the database
+    db = sqlite3.connect("recipe_finder.db")
+    db.execute("PRAGMA foreign_keys = ON")
+
+    # cursor object c
+    c = db.cursor()
+
+    recipe_name = input("Please input the NAME of your recipe (required): ")
+    recipe_description = input("Please input the DESCRIPTION of your recipe (optional): ")
+    recipe_instructions = input("Please input the INSTRUCTIONS of your recipe (required): ")
+    recipe_source = input("Please input the SOURCE where your recipe is from  (optional): ")
+
+    insert_query = ("INSERT INTO recipes (recipe_name, recipe_description, recipe_instructions, recipe_source) VALUES(?,?,?,?)")
+
+    c.execute(insert_query, (recipe_name, recipe_description, recipe_instructions, recipe_source))
+
+    db.commit()
+
+    recipe_id = c.lastrowid
+
+    print("Input all the required ingredient IDs, separating them with a space.")
+    ingredient_str = input("(Example: '1 12 14 28 47 32'): ")
+
+    ingredient_ids = ingredient_str.split()
+    print(ingredient_ids)
+
+    for i in range(len(ingredient_ids)):
+        if not ingredient_ids[int(i)].isdigit():
+            print(str(ingredient_ids[int(i)]) + " is not an accepted ID. Could not add.")
+            continue
+        c.execute("SELECT ingredient_name from ingredients WHERE ingredient_id = ?", (ingredient_ids[int(i)],))
+        ingredient_name = c.fetchone()[0]
+        quantity = input("Input the quantity for " + ingredient_name + ": " )
+    
+        c.execute("INSERT INTO recipe_lines (recipe_id, ingredient_id, quantity) VALUES (?,?,?)", (recipe_id, ingredient_ids[int(i)], quantity))
+        db.commit()
+
+    print("Recipe #" + str(recipe_id) + "(" + recipe_name + ") added! ")
+
+    db.close()
+
+def recipe_remove():
+    print("yee")
+
 def show_favorites():
 
     # connecting to the database
@@ -391,15 +475,19 @@ if __name__ == '__main__':
         
         # welcome message and cmd prompts
         print("""
-            Hello. Welcome to Recipe Finder v0.1. Please select an option:
+              Hello. Welcome to Recipe Finder v0.1. Please select an option:
 
-            [1] Search for recipe
-            [2] Search for ingredient
-            [3] Add ingredient to database
-            [4] Add recipe to database
-            [5] View recipe
-            [6] Favorites
-            [0] EXIT
+              [1] Search for recipe
+              [2] Search for ingredient
+              [3] Add ingredient to database
+              [4] Add recipe to database
+              [5] View recipe
+              [6] Favorites
+              [7] Delete ingredient from database
+              [8] Delete recipe from database
+              [9] Re-initialize database
+
+              [0] EXIT
             
         """)
         # user input for cmd
@@ -435,6 +523,26 @@ if __name__ == '__main__':
             loading_animation(2)
             ingredient_add(added_ingredient)
 
+        elif cmd == "4":
+            print("""
+                  PLEASE READ:
+                  Before adding a recipe, ensure that all ingredients are already added to the database.
+
+                  If you would like to see all the ingredients before continuing, please enter 'YES'.
+                  Otherwise, the Add Recipe Wizard will continue.
+                  """)
+                  
+            ingredient_cmd = input("Would you like to view all the ingredients in the database?: ")
+            if ingredient_cmd == "YES":
+                show_ingredients()
+
+            print("Are all the ingredients for your recipe in the database?")
+            ingredient_cmd = input("Type 'NO' to exit. Otherwise, installer will continue: ")
+
+            if ingredient_cmd != "NO":
+                recipe_add()
+        
+                
         # view recipe selected
         elif cmd == "5":
             recipe_view()
