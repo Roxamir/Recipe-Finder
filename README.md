@@ -57,3 +57,5 @@ https://stackoverflow.com/questions/41918836/how-do-i-get-rid-of-the-b-prefix-in
 https://www.sqlitetutorial.net/sqlite-exists/
 
 https://tutorpython.com/tutorial/readlines-without-newline
+
+https://stackoverflow.com/questions/6242756/how-to-retrieve-inserted-id-after-inserting-row-in-sqlite-using-python
