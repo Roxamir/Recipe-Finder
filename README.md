@@ -1,31 +1,9 @@
-# How to REQUEST and RECIEVE data
-
-In order to request data, the client will need to utilize ZeroMQ to connect to localhost:5555.
-
-    zmq::context_t context (1);
-    zmq::socket_t socket (context, zmq::socket_type::req);
-    socket.connect ("tcp://localhost:5555");
-
-Once connection is established, the client can send over data to be manipulated.
-          
-    socket.send (request, zmq::send_flags::none);
-
-Then, the client can recieve a reply from the server.
-
-     zmq::message_t reply;
-     socket.recv (reply, zmq::recv_flags::none);
-
-The client will send over a 11 strings that will be stored in an array on the server. Once stored, the data can be used to send a reply and to the client and obtain the necesarry information.
-
-![](MCU_microservice.drawio.png)
-        
-
-
 # Recipe-Finder
  An application that shows recipes based on available ingredients.
 
 # Prerequisites
 Python 3.12.2
+GNU C++ compiler
 
 # How to run
 Unzip zip file.
@@ -59,3 +37,5 @@ https://www.sqlitetutorial.net/sqlite-exists/
 https://tutorpython.com/tutorial/readlines-without-newline
 
 https://stackoverflow.com/questions/6242756/how-to-retrieve-inserted-id-after-inserting-row-in-sqlite-using-python
+
+https://www.dataquest.io/blog/python-subprocess/

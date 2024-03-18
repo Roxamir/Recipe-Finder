@@ -1,17 +1,14 @@
-
-
-from re import T
 import sqlite3
 import time
-from tkinter import ALL
-from numpy import add, empty
 from prettytable import PrettyTable, ALL
-import db_initialize
+import subprocess
+
 
 def loading_animation(x):
     for i in range(x):
         time.sleep(1)
         print("*")
+
 def show_ingredients():
     # connecting to the database
     db = sqlite3.connect("recipe_finder.db")
@@ -32,6 +29,32 @@ def show_ingredients():
     table.add_rows(ingredients) # add rows to table
 
     print("Here are all the ingredients in the database: ")
+    loading_animation(2)
+    print(table)
+    loading_animation(2)
+
+    db.close()
+
+def show_recipes():
+    # connecting to the database
+    db = sqlite3.connect("recipe_finder.db")
+    db.execute("PRAGMA foreign_keys = ON")
+
+    # cursor object c
+    c = db.cursor()
+
+    # Select all Names and Descriptions from ingredients
+    recipes = c.execute("SELECT recipe_id, recipe_name, recipe_description FROM recipes")
+
+    #format data with PrettyTable
+    table = PrettyTable()
+    table.hrules = ALL      # horizontal separators
+    table.field_names = ['ID','Recipe', 'Description']       # column titles
+    table._max_width = {"ID": 10, "Recipe" : 25, "Description" : 75} # max width for columns
+    table.align["Description"] = "l"    # left align description column
+    table.add_rows(recipes) # add rows to table
+
+    print("Here are all the recipes in the database: ")
     loading_animation(2)
     print(table)
     loading_animation(2)
@@ -75,7 +98,6 @@ def ingredient_search(ingredient):
 
 def ingredient_add(added_ingredient):
     
-    # query database to check for ingredient
     # connecting to the database
     db = sqlite3.connect("recipe_finder.db")
     db.execute("PRAGMA foreign_keys = ON")
@@ -128,18 +150,58 @@ def ingredient_add(added_ingredient):
     loading_animation(2)
 
 def ingredient_remove():
+    # warning animation
     for i in range(3):
         print("""
               *** WARNING ***
               """)
+        time.sleep(1)
+
     print("""
           PLEASE READ:
           DELETING AN INGREDIENT WILL ALSO DELETE THE RECIPE LINES ASSOCIATED WITH THAT INGREDIENT!!!
-          ENSURE THAT INGREDIENT IS NOT PRESENT IN ANY RECIPES BEFORE DELETING!!!
+          ENSURE THAT INGREDIENT IS NOT PRESENT IN ANY RECIPES BEFORE DELETING TO ENSURE RECUPES ARE CORRECT!!!
+
+          INPUT 'CONTINUE' TO PROCEED WITH INGREDIENT REMOVAL.
+          OTHERWISE PROGRAM WILL RETURN TO THE MAIN MENU.
           """)
     
-    show_ingredients()
-    removed_ingredient = input("Please enter ingredient ID of ingredient you wish to delete: ")
+    loading_animation(2)
+    
+    cont = input("Input 'CONTINUE' to proceeed: ")
+
+    loading_animation(2)
+
+    if cont == 'CONTINUE':
+        show_ingredients()
+        loading_animation(2)
+    
+    else:
+        print("CONTINUE not entered. Returning to main menu...")
+        loading_animation(2)
+
+    # connecting to the database
+    db = sqlite3.connect("recipe_finder.db")
+    db.execute("PRAGMA foreign_keys = ON")
+
+    # cursor object c
+    c = db.cursor()
+
+    ingredient_id = input("Please enter ingredient ID of ingredient you wish to delete: ")
+    loading_animation(2)
+
+    # get name of ingrdient to display to user for confirmation
+    name_query = ("SELECT ingredient_name FROM ingredients WHERE ingredient_id = ?")
+    c.execute(name_query, (ingredient_id,))
+    ingredient_name = c.fetchone()[0]
+
+    # executing delete query
+    c.execute("DELETE FROM ingredients WHERE ingredient_id = ?", (ingredient_id,))
+    db.commit()
+
+    print("'" + ingredient_name + "' deleted.")
+
+    db.close()    
     
 def recipe_search(recipe):
 
@@ -262,10 +324,15 @@ def recipe_add():
     # cursor object c
     c = db.cursor()
 
+    # recipe info
     recipe_name = input("Please input the NAME of your recipe (required): ")
+    loading_animation(2)
     recipe_description = input("Please input the DESCRIPTION of your recipe (optional): ")
+    loading_animation(2)
     recipe_instructions = input("Please input the INSTRUCTIONS of your recipe (required): ")
+    loading_animation(2)
     recipe_source = input("Please input the SOURCE where your recipe is from  (optional): ")
+    loading_animation(2)
 
     insert_query = ("INSERT INTO recipes (recipe_name, recipe_description, recipe_instructions, recipe_source) VALUES(?,?,?,?)")
 
@@ -273,21 +340,25 @@ def recipe_add():
 
     db.commit()
 
+    # save last inserted id
     recipe_id = c.lastrowid
 
+    # ingredient ids
     print("Input all the required ingredient IDs, separating them with a space.")
+    loading_animation(2)
     ingredient_str = input("(Example: '1 12 14 28 47 32'): ")
-
     ingredient_ids = ingredient_str.split()
-    print(ingredient_ids)
+    loading_animation(2)
 
     for i in range(len(ingredient_ids)):
         if not ingredient_ids[int(i)].isdigit():
             print(str(ingredient_ids[int(i)]) + " is not an accepted ID. Could not add.")
+            loading_animation(2)
             continue
         c.execute("SELECT ingredient_name from ingredients WHERE ingredient_id = ?", (ingredient_ids[int(i)],))
         ingredient_name = c.fetchone()[0]
         quantity = input("Input the quantity for " + ingredient_name + ": " )
+        loading_animation(2)
     
         c.execute("INSERT INTO recipe_lines (recipe_id, ingredient_id, quantity) VALUES (?,?,?)", (recipe_id, ingredient_ids[int(i)], quantity))
         db.commit()
@@ -297,7 +368,55 @@ def recipe_add():
     db.close()
 
 def recipe_remove():
-    print("yee")
+    # warning animation
+    for i in range(3):
+        print("""
+              *** WARNING ***
+              """)
+        time.sleep(1)
+    print("""
+          PLEASE READ:
+          DELETING A RECIPE IS IRREVERSIBLE!!!
+          ENSURE THAT RECIPE SELECTED IS THE ONE TO BE DELETED!!!
+
+          INPUT 'CONTINUE' TO PROCEED WITH RECIPE REMOVAL.
+          OTHERWISE PROGRAM WILL RETURN TO THE MAIN MENU.
+          """)
+    loading_animation(2)
+
+    cont = input("Input 'CONTINUE' to proceeed: ")
+    loading_animation(2)
+
+    if cont == 'CONTINUE':
+        show_recipes()
+        loading_animation(2)
+    
+    else:
+        print("CONTINUE not entered. Returning to main menu...")
+        loading_animation(2)
+
+    # connecting to the database
+    db = sqlite3.connect("recipe_finder.db")
+    db.execute("PRAGMA foreign_keys = ON")
+
+    # cursor object c
+    c = db.cursor()
+
+    recipe_id = input("Please enter recipe ID of recipe you wish to delete: ")
+    loading_animation(2)
+
+    # get name of ingrdient to display to user for confirmation
+    name_query = ("SELECT recipe_name FROM recipes WHERE recipe_id = ?")
+    c.execute(name_query, (recipe_id,))
+    recipe_name = c.fetchone()[0]
+
+    # executing delete query
+    c.execute("DELETE FROM recipes WHERE recipe_id = ?", (recipe_id,))
+    db.commit()
+
+    print("'" + recipe_name + "' deleted.")
+
+    db.close()    
 
 def show_favorites():
 
@@ -334,7 +453,7 @@ def show_favorites():
 def favorites():
 
     fav_cmd = ""
-    
+    loading_animation(2)
     while fav_cmd != "0": 
         print("""
               FAVORITES MENU
@@ -348,15 +467,20 @@ def favorites():
           """)
 
         fav_cmd = input("Input a number, then press enter: ")
+        loading_animation(2)
 
+        # view favorites
         if fav_cmd == "1":
             favorites = show_favorites()
+            loading_animation(2)
             print("""
                   To view a favorite recipe, enter the correct ID and press enter.
                   Otherwise, program will return to Favorites Menu.
                   """)
+            loading_animation(2)
 
             view_fav = input("Enter an ID, or return to Favorites Menu: ")
+            loading_animation(2)
 
             # check if input is correct format
             if view_fav.isdigit():
@@ -396,38 +520,43 @@ def favorites():
                     line_table.align["Ingredient"] = "l"    # left align ingredient column
                     line_table.add_rows(recipe_lines)
 
-                    # loading_animation(5)
+                    loading_animation(5)
 
                     print("You selected the recipe '" + recipe_name + "'. Here are the ingredients" )
-                    #loading_animation(2)
+                    loading_animation(2)
                     print(line_table)
-                    #loading_animation(5)
+                    loading_animation(5)
 
                     print("Here are the instructions: ")
-                    #loading_animation(2)
+                    loading_animation(2)
                     print(instructions)
 
-                    #loading_animation(5)
+                    loading_animation(5)
 
                     print("For more information, visit the recipe source: ")
-                    #loading_animation(2)
+                    loading_animation(2)
                     print(source)
 
                 else:
                     print("It seems that the ID input is not in your favorites. Please check input and try again.")
-                
+                    loading_animation(2)
             else:
                 print("It seems that the ID input is not in your favorites. Please check input and try again.")
                 fav_cmd = ""
+                loading_animation(2)
         
+        # add favorite
         if fav_cmd == "2":
             favorites = show_favorites()
+            loading_animation(2)
             print("""
                   As a reminder, these are your current favorites.
                   To add a favorite please input a recipe ID:
                   """)
+            loading_animation(2)
 
             add_fav = input("Input an ID to add to your favorites: ")
+            loading_animation(2)
             if add_fav.isdigit():
                 add_fav = int(add_fav)
                 if add_fav not in favorites:
@@ -435,21 +564,27 @@ def favorites():
                         file.write("ADD\n" + str(add_fav))
                     print("Favorite added!")
                     show_favorites()
+                    loading_animation(2)
 
                 else:
                     print("Entered ID is alread in your favorites. Please check input and try again.")
+                    loading_animation(2)
             else:
                 print("Invalid input. Please try again.")
+                loading_animation(2)
 
         # remove favorite
         if fav_cmd == "3":
             favorites = show_favorites()
+            loading_animation(2)
             print("""
                   As a reminder, these are your current favorites.
                   To remove a favorite please input a recipe ID:
                   """)
+            loading_animation(2)
 
             remove_fav = input("Input an ID to remove from your favorites: ")
+            loading_animation(2)
             if remove_fav.isdigit():
                 remove_fav = int(remove_fav)
                 if remove_fav in favorites:
@@ -457,15 +592,34 @@ def favorites():
                         file.write("REMOVE\n" + str(remove_fav))
                     print("Favorite removed!")
                     show_favorites()
+                    loading_animation(2)
 
                 else:
-                    print("Entered ID is already in your favorites. Please check input and try again.")
+                    print("Entered ID is not in your favorites. Please check input and try again.")
+                    loading_animation(2)
             else:
                 print("Invalid input. Please try again.")
+                loading_animation(2)
 # ~~~~~~~~~~~~~~~~~~~~~~~ MAIN PROGRAM ~~~~~~~~~~~~~~~~~~~~~~~ #
 # initialize values
 if __name__ == '__main__':
 
+    # run microservice
+    microservice = subprocess.Popen(["microservice.exe"], creationflags=subprocess.DETACHED_PROCESS)
+
+    print(r" ____           _              _____ _           _                   _   ___")
+    time.sleep(1)
+    print(r"|  _ \ ___  ___(_)_ __   ___  |  ___(_)_ __   __| | ___ _ __  __   _/ | / _ \ ")
+    time.sleep(1)
+    print(r"| |_) / _ \/ __| | '_ \ / _ \ | |_  | | '_ \ / _` |/ _ \ '__| \ \ / / || | | |")
+    time.sleep(1)
+    print(r"|  _ <  __/ (__| | |_) |  __/ |  _| | | | | | (_| |  __/ |     \ V /| || |_| |")
+    time.sleep(1)
+    print(r"|_| \_\___|\___|_| .__/ \___| |_|   |_|_| |_|\__,_|\___|_|      \_/ |_(_)___/")
+    time.sleep(1)
+    print(r"                 |_|                                                          ")
+    
+    # reset cmd before program start
     cmd = ""
     loading_animation(2)
     while cmd != "0":
@@ -475,7 +629,9 @@ if __name__ == '__main__':
         
         # welcome message and cmd prompts
         print("""
-              Hello. Welcome to Recipe Finder v0.1. Please select an option:
+              Welcome to Recipe Finder v1.0!
+
+              Please select an option:
 
               [1] Search for recipe
               [2] Search for ingredient
@@ -488,8 +644,8 @@ if __name__ == '__main__':
               [9] Re-initialize database
 
               [0] EXIT
-            
-        """)
+              """)
+        
         # user input for cmd
         loading_animation(2)
         cmd = input("Input a number, then press 'ENTER': ")
@@ -499,30 +655,29 @@ if __name__ == '__main__':
         print("You selected option " + cmd + ". Is this correct?")
         loading_animation(2)
         confirm = input("Press enter to continue or type 'RESTART' to restart program: ")
+        loading_animation(2)
         if confirm == "RESTART":
             cmd = ""
 
-        # recipe search selected
+        # recipe search
         elif cmd == "1":
-            loading_animation(2)
             recipe = input("Please input recipe: ")
             loading_animation(2)
             recipe_search(recipe)
 
-        # ingredient search selected
+        # ingredient search
         elif cmd == "2":
-            loading_animation(2)
             ingredient = input("Please input ingredient: ")
             loading_animation(2)
             ingredient_search(ingredient)
 
-        # add ingredient selected
+        # add ingredient
         elif cmd == "3":
-            loading_animation(2)
             added_ingredient = input("Enter an ingredient name to add: ")
             loading_animation(2)
             ingredient_add(added_ingredient)
 
+        # add recipe
         elif cmd == "4":
             print("""
                   PLEASE READ:
@@ -531,6 +686,8 @@ if __name__ == '__main__':
                   If you would like to see all the ingredients before continuing, please enter 'YES'.
                   Otherwise, the Add Recipe Wizard will continue.
                   """)
+            
+            loading_animation(2)
                   
             ingredient_cmd = input("Would you like to view all the ingredients in the database?: ")
             if ingredient_cmd == "YES":
@@ -543,24 +700,44 @@ if __name__ == '__main__':
                 recipe_add()
         
                 
-        # view recipe selected
+        # view recipe
         elif cmd == "5":
             recipe_view()
+            loading_animation(2)
 
+        # favorites
         elif cmd == "6":
             favorites()
+            loading_animation(2)
+        
+        # remove ingredient
+        elif cmd == "7":
+            ingredient_remove()
+            loading_animation(2)
 
-        # exit selected
+        # removce recipe
+        elif cmd == "8":
+            recipe_remove()
+            loading_animation(2)
+            
+        # re-initialize db    
+        elif cmd == "9":
+            subprocess.run(["python", "db_initialize.py"])
+            print("Database has been re-initialized with default data.")
+            loading_animation(2)
+
+        # exit
         elif cmd == "0":
             loading_animation(2)
             print("""
                 Thank you for using Recipe Finder
                 Now exiting...
                 """)
+            # stop microservice
+            microservice.kill()
             loading_animation(2)
 
         # invalid input, program restarted.
         else:
-            loading_animation(2)
             print("Invalid input. Please try again.")
             loading_animation(2)

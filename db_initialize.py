@@ -1,11 +1,6 @@
 import sqlite3
 import time
 
-db = sqlite3.connect("recipe_finder.db")
-db.execute("PRAGMA foreign_keys = ON")
-c = db.cursor()
-# 
-
 def create_db():
     # create recipes, ingredients and recipe_lines tables. if table exists, it is reinitailized.
     c.executescript("""
@@ -662,9 +657,19 @@ Although its primary flavor compound is vanillin, pure vanilla extract contains 
                     (10, 54, '1 tablespoon'); 
                     """)
 
-create_db()
-insert_data()
+if __name__ == '__main__':
+
+    
+    db = sqlite3.connect("recipe_finder.db")
+    db.execute("PRAGMA foreign_keys = ON")
+    c = db.cursor()
 
 
-db.commit()
-db.close()
+    create_db()
+    insert_data()
+
+
+    db.commit()
+    db.close()
+
+    print("Database initialized.")
