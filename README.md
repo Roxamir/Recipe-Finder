@@ -36,3 +36,5 @@ https://stackoverflow.com/questions/6242756/how-to-retrieve-inserted-id-after-in
 https://www.dataquest.io/blog/python-subprocess/
 
 https://pypi.org/project/auto-py-to-exe/
+
+https://stackoverflow.com/questions/82831/how-do-i-check-whether-a-file-exists-without-exceptions

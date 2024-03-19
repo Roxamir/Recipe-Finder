@@ -2,6 +2,8 @@ import sqlite3
 import time
 from prettytable import PrettyTable, ALL
 import subprocess
+import os
+import db_initialize
 
 
 def loading_animation(x):
@@ -547,6 +549,15 @@ def favorites():
         
         # add favorite
         if fav_cmd == "2":
+
+            # prompt to view aLL recipes
+            print("Would you like to see all the recipes in the database before adding")
+            loading_animation(2)
+            view_confirm = input("Enter 'Y' to view all recipes: ")
+
+            if view_confirm == 'Y':
+                show_recipes()
+            
             favorites = show_favorites()
             loading_animation(2)
             print("""
@@ -600,9 +611,16 @@ def favorites():
             else:
                 print("Invalid input. Please try again.")
                 loading_animation(2)
+
+
 # ~~~~~~~~~~~~~~~~~~~~~~~ MAIN PROGRAM ~~~~~~~~~~~~~~~~~~~~~~~ #
 # initialize values
 if __name__ == '__main__':
+
+    # initialize db if it doesn't exist
+    if not os.path.exists("recipe_finder.db"):
+        db_initialize.create_db()
+        db_initialize.insert_data()
 
     # run microservice
     microservice = subprocess.Popen(["microservice.exe"], creationflags=subprocess.DETACHED_PROCESS)
@@ -619,6 +637,8 @@ if __name__ == '__main__':
     time.sleep(1)
     print(r"                 |_|                                                          ")
     
+
+    print("***If this is your first time using the application, please run option [10] from the main menu to initialize the recipe database.***")
     # reset cmd before program start
     cmd = ""
     loading_animation(2)
@@ -637,11 +657,12 @@ if __name__ == '__main__':
               [2] Search for ingredient
               [3] Add ingredient to database
               [4] Add recipe to database
-              [5] View recipe
-              [6] Favorites
-              [7] Delete ingredient from database
-              [8] Delete recipe from database
-              [9] Re-initialize database
+              [5] View recipes
+              [6] View ingredients
+              [7] Favorites
+              [8] Delete ingredient from database
+              [9] Delete recipe from database
+              [10] Re-initialize database
 
               [0] EXIT
               """)
@@ -704,26 +725,53 @@ if __name__ == '__main__':
         elif cmd == "5":
             recipe_view()
             loading_animation(2)
+        
+        # view ingredients
+            show_ingredients()
+            loading_animation(2)
 
         # favorites
-        elif cmd == "6":
+        elif cmd == "7":
             favorites()
             loading_animation(2)
         
         # remove ingredient
-        elif cmd == "7":
+        elif cmd == "8":
             ingredient_remove()
             loading_animation(2)
 
         # removce recipe
-        elif cmd == "8":
+        elif cmd == "9":
             recipe_remove()
             loading_animation(2)
             
         # re-initialize db    
-        elif cmd == "9":
-            subprocess.run(["python", "db_initialize.py"])
-            print("Database has been re-initialized with default data.")
+        elif cmd == "10":
+                # warning animation
+            for i in range(3):
+                print("""
+                    *** WARNING ***
+                    """)
+                time.sleep(1)
+                print("""
+                    PLEASE READ:
+                    RE-INITIALIZING DATABASE IS IRREVERSIBLE!!!
+                    DATABASE WILL BE REVERTED TO ITS DEFAULT STATE!!!
+                      
+                    INPUT 'CONTINUE' TO PROCEED WITH RECIPE REMOVAL.
+                    OTHERWISE PROGRAM WILL RETURN TO THE MAIN MENU.
+                """)
+
+                confirmation = input("Input 'CONTINUE' to re-initialize database: ")
+                loading_animation(2)
+
+                if confirmation == 'CONTINUE':
+                    db_initialize.create_db()
+                    db_initialize.insert_data()
+                    print("Database has been re-initialized with default data.")
+
+                else:
+                    print("ABORTING...")
             loading_animation(2)
 
         # exit
