@@ -3,8 +3,9 @@
  An application that shows recipes based on available ingredients.
 
 ## Prerequisites
-
+Windows
 Python 3.12.2
+PrettyTable 3.11
 
 ## How to run
 
@@ -12,8 +13,6 @@ Unzip zip file.
 Open CLI where zip was unzipped.
 Run the following command:
     "python recipe_finder.py"
-
-Alternatively, you can run 'recipe_finder.exe' on Windows based systems.
 
 ## Resources
 
