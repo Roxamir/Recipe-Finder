@@ -4,8 +4,11 @@
 
 ## Prerequisites
 Windows
+
 Python 3.12.2
+
 PrettyTable 3.11
+
 
 ## How to run
 
